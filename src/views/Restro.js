@@ -9,9 +9,13 @@ export default function Restro() {
     { header: 'Phone Number', name: 'telephone' },
     { header: 'genre', name: 'genre' },
   ];
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [paginatedData, setPaginatedData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+    const [perPage] = useState(10);
 
-  const [data, setData] = useState([])
-  
+
   useEffect(() => {
     fetch('https://code-challenge.spectrumtoolbox.com/api/restaurants', {
       headers: {
@@ -22,12 +26,27 @@ export default function Restro() {
       .then((json) => {
         // console.log(json);
         setData(json);
+        setFilteredData(json);
       });
   }, []);
 
+  useEffect(()=>{
+    const indexOfLastData = currentPage * perPage;
+    const indexOfFirstData = indexOfLastData - perPage;
+    setPaginatedData(filteredData.slice(indexOfFirstData, indexOfLastData));
+  },[currentPage, perPage, filteredData])
+
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <div>
-      <Table cols={cols} rows={data} />
+      <Table cols={cols} rows={paginatedData} />
+      <Pagination
+        total={data.length}
+        perPage={10}
+        handlePageClick={handlePageClick}
+      />
     </div>
   );
 }
