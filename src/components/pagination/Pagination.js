@@ -1,3 +1,5 @@
+
+
 function Pagination({ total, perPage, handlePageClick }) {
   const pageNumbers = [];
 
