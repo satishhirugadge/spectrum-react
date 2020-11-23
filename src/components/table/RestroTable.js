@@ -1,12 +1,17 @@
 import Table from 'react-bootstrap/Table';
 
 function RestroTable(props) {
+
+   const handleHeaderClick = (e) => {
+      let header = e.target.getAttribute('name')
+      props.handleHeaderClick(header)
+   }
   return (
     <Table striped bordered hover>
       <thead>
         <tr>
           {props.cols.map((col) => (
-            <th key={col.name}> {col.header}</th>
+            <th key={col.name} > <div name={col.name} onClick={handleHeaderClick}>{col.header}</div></th>
           ))}
         </tr>
       </thead>

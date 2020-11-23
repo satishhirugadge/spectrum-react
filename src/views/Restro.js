@@ -18,6 +18,7 @@ export default function Restro() {
     { header: 'Genre', name: 'genre' },
   ];
   const [searchText, setSearchText] = useState('');
+  const [sort, setSort] = useState();
   const [searchButtonClick, setSearchButtonClick] = useState('');
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -76,9 +77,22 @@ export default function Restro() {
         return common.length > 0;
       });
     }
+    if(sort !== ''){
+      console.log('working')
+    finalData = finalData.sort(function (a, b) {
+      if (a[sort] < b[sort]) {
+        return -1;
+      }
+      if (a[sort] > b[sort]) {
+        return 1;
+      }
+      return 0;
+    });
+  
+  }
     setCurrentPage(1);
     setFilteredData(finalData);
-  }, [filterState, data, filterGenre, searchButtonClick]);
+  }, [filterState, data, filterGenre, searchButtonClick, sort]);
 
   const handlePageClick = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -112,16 +126,20 @@ export default function Restro() {
   };
 
   const handleKeyPress = (event) => {
-    console.log(event.target.value)
-    if(event.key === 'Enter'){
+    console.log(event.target.value);
+    if (event.key === 'Enter') {
       setSearchText(event.target.value);
       setSearchButtonClick(searchText);
     }
-  }
+  };
   const handleSearchButtonClick = () => {
     setSearchButtonClick(searchText);
   };
 
+  const handleHeaderClick = (name) => {
+    console.log(name);
+    setSort(name);
+  };
   const handleClearStateFilter = () => {
     setFilterState([]);
   };
@@ -148,11 +166,18 @@ export default function Restro() {
         </Col>
         <Col>
           <Row style={{ justifyContent: 'flex-end', margin: 10 }}>
-            <input type='text' onChange={handleInputChange} onKeyPress={handleKeyPress}></input>
+            <input
+              type='text'
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}></input>
             <Button onClick={handleSearchButtonClick}> Search</Button>
           </Row>
           <Row>
-            <RestroTable cols={cols} rows={paginatedData} />
+            <RestroTable
+              cols={cols}
+              rows={paginatedData}
+              handleHeaderClick={handleHeaderClick}
+            />
             {paginatedData.length < 1 && (
               <Row
                 style={{

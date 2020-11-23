@@ -10,7 +10,7 @@ function SPagination({ total, perPage, currentPageNumber, handlePageClick }) {
   return (
     <Pagination >
       {pageNumbers.map((number) => (
-        <Pagination.Item key={number} href='!#' active={number === currentPageNumber} onClick={() => handlePageClick(number)}>
+        <Pagination.Item key={number} active={number === currentPageNumber} onClick={() => handlePageClick(number)}>
           {number}
         </Pagination.Item>
       ))}
