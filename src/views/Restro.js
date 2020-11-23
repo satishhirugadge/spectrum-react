@@ -111,6 +111,13 @@ export default function Restro() {
     setSearchText(event.target.value);
   };
 
+  const handleKeyPress = (event) => {
+    console.log(event.target.value)
+    if(event.key === 'Enter'){
+      setSearchText(event.target.value);
+      setSearchButtonClick(searchText);
+    }
+  }
   const handleSearchButtonClick = () => {
     setSearchButtonClick(searchText);
   };
@@ -141,7 +148,7 @@ export default function Restro() {
         </Col>
         <Col>
           <Row style={{ justifyContent: 'flex-end', margin: 10 }}>
-            <input type='text' onChange={handleInputChange}></input>
+            <input type='text' onChange={handleInputChange} onKeyPress={handleKeyPress}></input>
             <Button onClick={handleSearchButtonClick}> Search</Button>
           </Row>
           <Row>
