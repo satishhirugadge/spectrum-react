@@ -1,8 +1,14 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import Table from './../components/table/Table';
-import Pagination from './../components/pagination/Pagination';
+import RestroTable from '../components/table/RestroTable';
+import SPagination from './../components/pagination/Pagination';
 import StateFilter from './../components/StateFilter';
+import GenreFilter from './../components/GenreFilter';
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 export default function Restro() {
   const cols = [
     { header: 'Name', name: 'name' },
@@ -11,14 +17,15 @@ export default function Restro() {
     { header: 'Phone Number', name: 'telephone' },
     { header: 'Genre', name: 'genre' },
   ];
+  const [searchText, setSearchText] = useState('');
+  const [searchButtonClick, setSearchButtonClick] = useState('');
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [paginatedData, setPaginatedData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(10);
   const [filterState, setFilterState] = useState([]);
-
-  const genre = ['Steak', 'American', 'Contemporary', 'Seafood', 'Cafe'];
+  const [filterGenre, setFilterGenre] = useState([]);
 
   useEffect(() => {
     fetch('https://code-challenge.spectrumtoolbox.com/api/restaurants', {
@@ -28,7 +35,12 @@ export default function Restro() {
     })
       .then((response) => response.json())
       .then((json) => {
-        // console.log(json);
+        //console.log(json);
+        json = json.map((v) => {
+          let genreArray = v.genre.split(',');
+          return { ...v, genreArray: genreArray };
+        });
+        console.log(json);
         setData(json);
         setFilteredData(json);
       });
@@ -37,20 +49,40 @@ export default function Restro() {
   useEffect(() => {
     const indexOfLastData = currentPage * perPage;
     const indexOfFirstData = indexOfLastData - perPage;
-    setPaginatedData(filteredData.slice(indexOfFirstData, indexOfLastData));
+    let slicedData = filteredData.slice(indexOfFirstData, indexOfLastData);
+    console.log('slice', slicedData);
+    setPaginatedData(slicedData);
   }, [currentPage, perPage, filteredData]);
 
   useEffect(() => {
-    if (filterState.length === 0) {
-      setFilteredData(data);
-    } else {
-      setFilteredData(
-        data.filter((v) => {
-          return filterState.includes(v.state);
-        })
-      );
+    let finalData = data;
+    let searchTextLower = searchButtonClick.toLowerCase();
+    if (searchButtonClick !== '') {
+      finalData = finalData.filter((v) => {
+        return (
+          v.city.toLowerCase().includes(searchTextLower) ||
+          v.name.toLowerCase().includes(searchTextLower) ||
+          v.genre.toLowerCase().includes(searchTextLower)
+        );
+      });
     }
-  }, [filterState, data]);
+    if (filterState.length !== 0) {
+      finalData = finalData.filter((v) => {
+        return filterState.includes(v.state);
+      });
+    }
+    if (filterGenre.length !== 0) {
+      finalData = finalData.filter((v) => {
+        let common = v.genreArray.filter((value) =>
+          filterGenre.includes(value)
+        );
+        return common.length > 0;
+      });
+    }
+    console.log(finalData);
+    setCurrentPage(1);
+    setFilteredData(finalData);
+  }, [filterState, data, filterGenre, searchButtonClick]);
 
   const handlePageClick = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -68,15 +100,82 @@ export default function Restro() {
     }
     setFilterState(filter);
   };
+
+  const handleGenreChecked = (genre, checked) => {
+    console.log(genre, checked);
+    let filter = [];
+    if (checked) {
+      filter = [...filterGenre, genre];
+    } else {
+      filter = filterGenre.filter((i) => {
+        return i !== genre;
+      });
+    }
+    setFilterGenre(filter);
+  };
+  const handleInputChange = (event) => {
+    setSearchText(event.target.value);
+  };
+
+  const handleSearchButtonClick = () => {
+    setSearchButtonClick(searchText);
+  };
+
+  const handleClearStateFilter = () => {
+    setFilterState([]);
+  };
+  const style = {
+    filter: {
+      marginTop: 100,
+    },
+  };
   return (
-    <div>
-      <Table cols={cols} rows={paginatedData} />
-      <Pagination
-        total={filteredData.length}
-        perPage={10}
-        handlePageClick={handlePageClick}
-      />
-      <StateFilter handleStateChecked={handleStateChecked} />
-    </div>
+    <Container>
+      <Row>
+        <Col md={4} style={style.filter}>
+          <Row>
+            <StateFilter
+              handleStateChecked={handleStateChecked}
+              handleClearStateFilter={handleClearStateFilter}
+              filteredApplied={filterState}
+            />
+          </Row>
+          <Row style={{ width: 250 }}>
+            <Row>Filter by Genre:</Row>
+            <GenreFilter handleGenreChecked={handleGenreChecked}></GenreFilter>
+          </Row>
+        </Col>
+        <Col>
+          <Row style={{ justifyContent: 'flex-end', margin: 10 }}>
+            <input type='text' onChange={handleInputChange}></input>
+            <Button onClick={handleSearchButtonClick}> Search</Button>
+          </Row>
+          <Row>
+            <RestroTable cols={cols} rows={paginatedData} />
+            {paginatedData.length < 1 && (
+              <Row
+                style={{
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  width: 760,
+                  height: 300,
+                  marginLeft: 2,
+                }}>
+                {' '}
+                <div>NO DATA</div>
+              </Row>
+            )}
+          </Row>
+          <Row style={{ justifyContent: 'center' }}>
+            <SPagination
+              total={filteredData.length}
+              perPage={10}
+              currentPageNumber={currentPage}
+              handlePageClick={handlePageClick}
+            />
+          </Row>
+        </Col>
+      </Row>
+    </Container>
   );
 }
