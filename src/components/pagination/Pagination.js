@@ -1,6 +1,6 @@
+import Pagination from 'react-bootstrap/Pagination'
 
-
-function Pagination({ total, perPage, handlePageClick }) {
+function SPagination({ total, perPage, currentPageNumber, handlePageClick }) {
   const pageNumbers = [];
 
   for (let i = 1; i <= Math.ceil(total / perPage); i++) {
@@ -8,14 +8,14 @@ function Pagination({ total, perPage, handlePageClick }) {
   }
 
   return (
-    <div>
+    <Pagination >
       {pageNumbers.map((number) => (
-        <button key={number} href='!#' onClick={() => handlePageClick(number)}>
+        <Pagination.Item key={number} href='!#' active={number === currentPageNumber} onClick={() => handlePageClick(number)}>
           {number}
-        </button>
+        </Pagination.Item>
       ))}
-    </div>
+    </Pagination>
   );
 }
 
-export default Pagination;
+export default SPagination;
