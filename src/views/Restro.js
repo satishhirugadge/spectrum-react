@@ -35,12 +35,10 @@ export default function Restro() {
     })
       .then((response) => response.json())
       .then((json) => {
-        //console.log(json);
         json = json.map((v) => {
           let genreArray = v.genre.split(',');
           return { ...v, genreArray: genreArray };
         });
-        console.log(json);
         setData(json);
         setFilteredData(json);
       });
@@ -50,7 +48,6 @@ export default function Restro() {
     const indexOfLastData = currentPage * perPage;
     const indexOfFirstData = indexOfLastData - perPage;
     let slicedData = filteredData.slice(indexOfFirstData, indexOfLastData);
-    console.log('slice', slicedData);
     setPaginatedData(slicedData);
   }, [currentPage, perPage, filteredData]);
 
@@ -79,7 +76,6 @@ export default function Restro() {
         return common.length > 0;
       });
     }
-    console.log(finalData);
     setCurrentPage(1);
     setFilteredData(finalData);
   }, [filterState, data, filterGenre, searchButtonClick]);
@@ -89,7 +85,6 @@ export default function Restro() {
   };
 
   const handleStateChecked = (state, checked) => {
-    console.log(state, checked);
     let filter = [];
     if (checked) {
       filter = [...filterState, state];
@@ -102,7 +97,6 @@ export default function Restro() {
   };
 
   const handleGenreChecked = (genre, checked) => {
-    console.log(genre, checked);
     let filter = [];
     if (checked) {
       filter = [...filterGenre, genre];

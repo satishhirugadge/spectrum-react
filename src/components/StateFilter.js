@@ -108,7 +108,6 @@ function StateFilter({
   }, [inputState, state, filteredApplied]);
 
   function handleListClicked(v) {
-    console.log('click', v.target.name);
     handleStateChecked(v.target.name, true);
   }
 
