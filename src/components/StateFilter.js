@@ -1,5 +1,4 @@
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
@@ -72,12 +71,10 @@ function StateFilter({
   ];
 
   const [inputState, setInputState] = useState('');
-  const [state, setState] = useState(stateAbbreviations);
+  const [state] = useState(stateAbbreviations);
   const [filteredState, setFilterState] = useState(stateAbbreviations);
   const [openList, setOpenList] = useState(false);
-  const handleChange = (event) => {
-    handleStateChecked(event.target.name, event.target.checked);
-  };
+
   const style = {
     row: {
       marginRight: 4,
